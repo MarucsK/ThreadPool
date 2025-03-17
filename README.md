@@ -35,7 +35,7 @@
 ### 4.整体架构
 ![Pasted image 20250214201329](https://github.com/user-attachments/assets/52a45634-9c14-45ab-b143-d69c2a76e88a)
 
-用户使用方法：详见[[test.cpp]]
+用户使用方法：详见[test.cpp](https://github.com/xykCs/ThreadPool/blob/main/test.cpp)
 - `ThreadPool pool`定义一个线程池对象，然后设置模式（fixed或cached），启动线程池（创建线程，严阵以待）
 - `Result result = pool.submitTask(concrete Task)`：`concrete Task`是一个任务实体，然后提交该任务。有的任务执行完需要返回值，所以用`result`接收
 - `result.get().Cast<结果类型>()`：不同的任务的返回值类型不同，使用用C++11中的any（只能存储一个元素，该元素为一种基本或复合数据类型）
