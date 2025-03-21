@@ -1,4 +1,6 @@
 # ThreadPool
+![GitHub License](https://img.shields.io/github/license/xykCs/ThreadPool)
+
 一个基于C++11的跨平台高性能动态线程池，支持动态线程扩缩容和智能任务调度。，可高效管理多任务并发执行。
 ### 功能特性：
 - 双工作模式支持  
