@@ -1,7 +1,7 @@
 # ThreadPool
 ![GitHub License](https://img.shields.io/github/license/xykCs/ThreadPool)
 
-一个基于C++11标准库实现的高性能线程池，支持固定线程数量和动态线程扩容两种模式。提供任务队列管理、自动线程回收、超时等待等特性，可集成到各类C++项目中。
+一个基于C++11实现的高性能线程池，支持固定线程数量和动态线程扩容两种模式。提供任务队列管理、自动线程回收、超时等待等特性，可集成到各类C++项目中。
 ### 整体架构
 ![image](https://github.com/user-attachments/assets/40297838-98b7-4e18-b8ea-f92d43b9ab1a)
 ### 支持
