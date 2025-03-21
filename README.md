@@ -33,7 +33,8 @@
 线程池里面的线程个数是可动态增长的，根据任务的数量动态的增加线程的数量，但是会设置一个线程数量的阈值（线程过多的坏处上面已经讲过了），任务处理完成，如果动态增长的线程空闲了60s还没有处理其它任务，那么关闭线程，保持池中最初数量的线程即可。
 
 ### 4. 整体架构
-![Pasted image 20250214201329](https://github.com/user-attachments/assets/52a45634-9c14-45ab-b143-d69c2a76e88a)
+![image](https://github.com/user-attachments/assets/0f3d5e95-bd55-4a27-bd42-68e585366c58)
+
 
 
 用户使用方法：详见[test.cpp](https://github.com/xykCs/ThreadPool/blob/main/test.cpp)
