@@ -10,7 +10,6 @@ using namespace std;
 int sum1(int a, int b)
 {
     this_thread::sleep_for(chrono::seconds(3));
-    // 比较耗时
     return a + b;
 }
 int sum2(int a, int b, int c)
@@ -18,16 +17,7 @@ int sum2(int a, int b, int c)
     this_thread::sleep_for(chrono::seconds(3));
     return a + b + c;
 }
-// io线程 
-void io_thread(int listenfd)
-{
 
-}
-// worker线程
-void worker_thread(int clientfd)
-{
-
-}
 int main()
 {
     ThreadPool pool;
@@ -63,20 +53,4 @@ int main()
     cout << r6.get() << endl;
     cout << r7.get() << endl;
     cout << r8.get() << endl;
-
-
-    //packaged_task<int(int, int)> task(sum1);
-    //// future <=> Result
-    //future<int> res = task.get_future();
-    //// task(10, 20);
-    //thread t(std::move(task), 10, 20);
-    //t.detach();
-
-    //cout << res.get() << endl;
-
-    /*thread t1(sum1, 10, 20);
-    thread t2(sum2, 1, 2, 3);
-
-    t1.join();
-    t2.join();*/
 }
