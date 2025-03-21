@@ -1,18 +1,24 @@
 # ThreadPool
 ![GitHub License](https://img.shields.io/github/license/xykCs/ThreadPool)
 
-一个基于C++11的跨平台高性能动态线程池，支持动态线程扩缩容和智能任务调度。，可高效管理多任务并发执行。
-### 功能特性：
-- 双工作模式支持  
-    - FIXED模式: 固定数量工作线程
-    - CACHED模式: 线程数量动态扩容收缩
-
-
-### Qucik
-##### 依赖要求：
-- 支持C++20标准
-- Linux
-
+一个基于C++11标准库实现的高性能线程池，支持固定线程数量和动态线程扩容两种模式。提供任务队列管理、自动线程回收、超时等待等特性，可集成到各类C++项目中。
+### 整体架构
+![image](https://github.com/user-attachments/assets/40297838-98b7-4e18-b8ea-f92d43b9ab1a)
+### 支持
+- 操作系统
+    - linux
+    - windows
+ - 编译器
+     - g++ 4.8及以上
+     - Clang 3.3及以上
+     - MSVC:vs2015及以上
+### QuickStart
+##### 依赖：
+- C++11标准
+##### 引入头文件
+```cpp
+#include "ThreadPool.h"
+```
 ##### demo：
 ```cpp
 #include <iostream>
@@ -67,7 +73,6 @@ int main()
 }
 ```
 
-### 整体架构
-![image](https://github.com/user-attachments/assets/40297838-98b7-4e18-b8ea-f92d43b9ab1a)
+
 
 
