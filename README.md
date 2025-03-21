@@ -1,43 +1,74 @@
 # ThreadPool
-作为五大池(进程池、线程池、内存池、数据库连接池、对象池)之一，不管是客户端程序，还是后台服务程序，线程池都是提高业务处理能力的必备模块。
+作为五大池(进程池、线程池、内存池、数据库连接池、对象池)之一，不管是客户端程序，还是后台服务程序，线程池都是提高业务处理能力的必备模块。本项目实现一个基于C++11的跨平台动态线程池实现，支持固定线程数量和动态资源调整两种工作模式，可高效管理多任务并发执行。
+### 功能特性：
+(1)双模式支持  
+- FIXED模式: 固定数量工作线程
+- CACHED模式: 线程数量动态扩容收缩
+(2)智能资源管理  
+- 自动回收空闲线程（60秒无任务）
+- 任务队列容量保护机制（默认1024任务上限）
+- 线程数量动态调整（根据任务压力）
+(3)高性能特性  
+- 无锁任务队列设计（基于互斥锁+条件变量）
+- 支持批量任务唤醒机制
+- 线程安全的任务提交接口
+(4)Future机制  
+- 支持通过std::future获取任务返回值
+- 任务超时提交检测（1秒队列满快速失败）
 
+### 快速开始
+```cpp
+#include <iostream>
+#include <future>
+#include <chrono>
+using namespace std;
 
-### 1. 并发和并行
-**并发（concureent）**：单核上，多个线程占用不同的CPU时间片，物理上仍是串行执行的，但是由于每个线程占用的CPU时间片非常短，看起来就像是多个线程在共同执行一样，这种场景称作并发。
-**并行（parallel）**：在多核或者多CPU上，多个线程在真正的同时执行，这种场景称作并行。
+#include "threadpool.h"
 
-### 2. 多线程的优势
-多线程一定好吗？不一定，看具体应用场景
-#### IO密集型
-该程序需要大量的输入输出操作，而CPU处理时间相对较少。在执行 IO 密集型任务时，程序大部分时间都在**等待** IO 设备完成数据的读取或写入，而不是进行复杂的计算。
+int sum1(int a, int b)
+{
+    this_thread::sleep_for(chrono::seconds(3));
+    return a + b;
+}
+int sum2(int a, int b, int c)
+{
+    this_thread::sleep_for(chrono::seconds(3));
+    return a + b + c;
+}
+int main()
+{
+    ThreadPool pool;
+    pool.setMode(PoolMode::MODE_CACHED);
+    pool.start(8);
 
-无论CPU单核、CPU多核、多CPU，IO密集型任务都是适合多线程的：在一个线程等待 IO 操作完成时，其他线程可以继续执行，从而充分利用 CPU 资源，提高系统的并发处理能力。
-#### CPU密集型
-- CPU单核：多线程存在上下文切换，是额外的花销，线程越多上下文切换所花费的额外时间也越多，倒不如一个线程一直计算。
-- CPU多核、多CPU：多个线程可以并行执行，对CPU利用率高
-### 3. 线程池
-#### 线程的消耗
-为了完成任务，创建很多的线程可以吗？线程真的越多越好?
-- 线程的创建和销毁都是非常“重”的操作
-- 线程栈本身占用大量内存（创建了一大批线程，还没做具体的事情，每一个线程都需要线程栈，栈几乎被占用完了，还怎么做事情？）
-- 线程的上下文切换要占用大量时间（线程过多，线程调度花上下文切换花费的CPU时间也过多，CPU利用率就不高）
-- 大量线程同时唤醒会使系统经常出现锯齿状负载或者瞬间负载很大导致宕机（同一时间，很多IO操作准备好了，同时唤醒大量线程）
+    future<int> r1 = pool.submitTask(sum1, 1, 2);
+    future<int> r2 = pool.submitTask(sum2, 1, 2, 3);
+    future<int> r3 = pool.submitTask([](int b, int e)->int {
+        int sum = 0;
+        for (int i = b; i <= e; i++)
+            sum += i;
+        return sum;
+        }, 1, 100);
+    future<int> r4 = pool.submitTask([](int b, int e)->int {
+        int sum = 0;
+        for (int i = b; i <= e; i++)
+            sum += i;
+        return sum;
+        }, 1, 100);
+    future<int> r5 = pool.submitTask([](int b, int e)->int {
+        int sum = 0;
+        for (int i = b; i <= e; i++)
+            sum += i;
+        return sum;
+        }, 1, 100);
 
-#### 线程池的优势
-操作系统上创建线程和销毁线程都是很"重"的操作，耗时耗性能都比较多，那么在服务执行的过程中，如果业务量比较大，实时的去创建线程、执行业务、业务完成后销毁线程，那么会导致系统的实时性能降低，业务的处理能力也会降低。
+    cout << r1.get() << endl;
+    cout << r2.get() << endl;
+    cout << r3.get() << endl;
+    cout << r4.get() << endl;
+    cout << r5.get() << endl;
+}
+```
 
-线程池的优势就是（每个池都有自己的优势），在服务进程启动之初，就事先创建好线程池里面的线程，当业务流量到来时需要分配线程，直接从线程池中获取一个空闲线程执行task任务即可，task执行完成后，也不用释放线程，而是把线程归还到线程池中继续给后续的task提供服务。
-#### fixed模式线程池
-线程池里面的线程个数是固定不变的，一般是ThreadPool创建时根据当前机器的CPU核心数量进行指定。
-#### cached模式线程池
-线程池里面的线程个数是可动态增长的，根据任务的数量动态的增加线程的数量，但是会设置一个线程数量的阈值（线程过多的坏处上面已经讲过了），任务处理完成，如果动态增长的线程空闲了60s还没有处理其它任务，那么关闭线程，保持池中最初数量的线程即可。
-
-### 4. 整体架构
-![image](https://github.com/user-attachments/assets/0f3d5e95-bd55-4a27-bd42-68e585366c58)
-
-
-
-用户使用方法：详见[test.cpp](https://github.com/xykCs/ThreadPool/blob/main/test.cpp)
-- `ThreadPool pool`定义一个线程池对象，然后设置模式（fixed或cached），启动线程池（创建线程，严阵以待）
-- `Result result = pool.submitTask(concrete Task)`：`concrete Task`是一个任务实体，然后提交该任务。有的任务执行完需要返回值，所以用`result`接收
-- `result.get().Cast<结果类型>()`：不同的任务的返回值类型不同，使用用C++11中的any（只能存储一个元素，该元素为一种基本或复合数据类型）
+### 整体架构
+![image](https://github.com/user-attachments/assets/f059a903-4003-42bb-8fca-367a08c8d284)
