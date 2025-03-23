@@ -1,21 +1,23 @@
 # ThreadPool
 ![GitHub License](https://img.shields.io/github/license/xykCs/ThreadPool)
 
-一个基于C++11实现的高性能线程池，支持固定线程数量和动态线程扩容两种模式。提供任务队列管理、自动线程回收、超时等待等特性，可集成到各类C++项目中。
-### 整体架构
+A high-performance thread pool implemented in C++11, supporting both fixed thread count and dynamic thread expansion modes. It offers task queue management, automatic thread recycling, and timeout waiting features, and can be integrated into various C++ projects.
+
+### Overall Architecture
 ![image](https://github.com/user-attachments/assets/40297838-98b7-4e18-b8ea-f92d43b9ab1a)
-### 支持
-- 操作系统
+### Supported
+- Operating System
     - linux
     - windows
- - 编译器
-     - g++ 4.8及以上
-     - Clang 3.3及以上
-     - MSVC : vs2015及以上
+ - Compiler
+     - g++ 4.8 and above
+     - Clang 3.3 and above
+     - MSVC : vs2015 and above
 ### QuickStart
-##### 依赖：
-- C++11标准
-##### 引入头文件
+##### Dependencies:
+- C++ Standard: C++11
+##### Include Headers:
+To use the thread pool, you might need to include headers like:
 ```cpp
 #include "ThreadPool.h"
 ```
