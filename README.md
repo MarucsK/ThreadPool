@@ -1,7 +1,8 @@
 # ThreadPool
 ![GitHub License](https://img.shields.io/github/license/xykCs/ThreadPool)
 
-A high-performance thread pool implemented in C++11, supporting both fixed thread count and dynamic thread expansion modes. It offers task queue management, automatic thread recycling, and timeout waiting features, and can be integrated into various C++ projects.
+A high-performance thread pool implemented in C++11/14, supporting both fixed thread count and dynamic thread expansion modes. It offers task queue management, automatic thread recycling, and timeout waiting features, and can be integrated into various C++ projects.
+A thread pool implementation based on C++ (requires C++14 or higher for `std::make_unique`). It offers fixed thread count and dynamic thread expansion modes, task queue threshold control, idle thread timeout recovery, task submission timeout handling, and asynchronous result retrieval via `std::future`. Utilizes RAII for resource management.
 
 ### Overall Architecture
 ![image](https://github.com/user-attachments/assets/40297838-98b7-4e18-b8ea-f92d43b9ab1a)
@@ -15,7 +16,7 @@ A high-performance thread pool implemented in C++11, supporting both fixed threa
      - MSVC : vs2015 and above
 ### QuickStart
 ##### Dependencies:
-- C++ Standard: C++11
+- C++ Standard: C++14
 ##### Include Headers:
 To use the thread pool, you might need to include headers like:
 ```cpp
