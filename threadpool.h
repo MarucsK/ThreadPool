@@ -16,7 +16,7 @@ const int TASK_MAX_THRESHHOLD = 1024;
 const int THREAD_MAX_THRESHHOLD = 1024;
 const int THREAD_MAX_IDLE_TIME = 60; // 单位：秒
 
-// 线程池支持的两种模式
+// 线程池支持的两种工作模式
 enum class PoolMode {
 	MODE_FIXED, // 固定数量的线程
 	MODE_CACHED, // 线程数量可动态增长
