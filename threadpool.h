@@ -14,12 +14,11 @@
 
 const int TASK_MAX_THRESHHOLD = 1024;
 const int THREAD_MAX_THRESHHOLD = 1024;
-const int THREAD_MAX_IDLE_TIME = 60; // 单位：秒
+const int THREAD_MAX_IDLE_TIME = 60; // seconds
 
-// 线程池支持的两种工作模式
 enum class PoolMode {
-	MODE_FIXED, // 固定数量的线程
-	MODE_CACHED, // 线程数量可动态增长
+	MODE_FIXED, 
+	MODE_CACHED, 
 };
 
 class Thread {
@@ -33,7 +32,6 @@ public:
 
 	~Thread() = default;
 
-	// 启动线程
 	void start() {
 		std::thread t(func_, threadId_);
 		t.detach();
@@ -66,12 +64,8 @@ public:
 
 	~ThreadPool() {
 		isPoolRunning_ = false;
-		// 等待线程池里所有的线程返回
-		// 线程有两种状态：阻塞 、正在执行任务
 		std::unique_lock<std::mutex> lock(taskQueMtx_);
-		// 唤醒阻塞的 线程池里的线程，让它执行资源释放
 		notEmpty_.notify_all();
-		// 一直等到没有线程对象存在，析构才结束
 		exitCond_.wait(lock, [&]()->bool { return threads_.size() == 0; });
 	}
 
@@ -128,8 +122,7 @@ public:
 		std::future<RType> result = task->get_future();
 
 		std::unique_lock<std::mutex> lock(taskQueMtx_);
-		// 等待任务队列有空余
-		// 用户提交任务，最长不能阻塞超过1s，否则判断提交任务失败，返回
+
 		if (!notFull_.wait_for(lock, std::chrono::seconds(1),
 			[&]()->bool {return taskQue_.size() < (size_t)taskQueMaxThreshHold_; }))
 		{
@@ -141,22 +134,20 @@ public:
 			(*task)();
 			return task->get_future();
 		}
-		// 如果有空余，把任务放入任务队列中
+
 		taskQue_.emplace([task]() {(*task)(); });
 		taskSize_++;
 		notEmpty_.notify_all();
 
-		// cached模式下，根据任务数量和空闲线程数量，判断是否需要创建新的线程
 		if (poolMode_ == PoolMode::MODE_CACHED
 			&& taskSize_ > idleThreadSize_
 			&& curThreadSize_ < threadSizeThreshHold_)
 		{
-			// 创建新线程对象
 			std::cout << ">>>create new!" << std::endl;
 			std::unique_ptr<Thread> ptr = std::make_unique<Thread>(std::bind(&ThreadPool::threadFunc, this, std::placeholders::_1));
 			int threadId = ptr->getId();
 			threads_.emplace(threadId, std::move(ptr));
-			// 启动该线程
+
 			threads_[threadId]->start();
 			curThreadSize_++; 
 			idleThreadSize_++; 
@@ -173,7 +164,6 @@ private:
 				std::unique_lock<std::mutex> lock(taskQueMtx_);
 				std::cout << std::this_thread::get_id() << "trying to acquire the task." << std::endl;
 
-				// 如果任务队列为空, CACHED模式下要考虑回收线程, FIXED模式下死等任务
 				while (taskQue_.size() == 0) {
 					if (!isPoolRunning_) {
 						threads_.erase(threadId);
@@ -185,7 +175,7 @@ private:
 						if (std::cv_status::timeout == notEmpty_.wait_for(lock, std::chrono::seconds(1))) {
 							auto now = std::chrono::high_resolution_clock::now();
 							auto dur = std::chrono::duration_cast<std::chrono::seconds>(now - lastTime);
-							// 如果空闲时间>60s, 且目前线程总数>初始线程数, 就回收当前线程
+
 							if (dur.count() >= THREAD_MAX_IDLE_TIME
 								&& curThreadSize_ > initThreadSize_) {
 								curThreadSize_--;
